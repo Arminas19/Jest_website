@@ -8,9 +8,11 @@ const {
     showScore,
     addTurn,
     lightsOn,
-    showTurns
+    showTurns,
+    playerTurn
 } = require("../game");
 
+jest.spyOn(window, 'alert').mockImplementation(() => {});
 
 beforeAll(() => {
     let fs = require("fs");
@@ -38,6 +40,13 @@ describe("game object contains correct keys", () => {
     });
     test("turnNumber key exists", () => {
         expect("turnNumber" in game).toBe(true);
+    });
+    test('turnProgress key is set to true', () => {
+        showTurns();
+        expect(game.turnInProgress).toEqual(true);
+    });
+    test('check if the tunrInProgress key and lastButton is in the same object', () => {
+       expect('turnInProgress' && 'lastButton' in game).toBe(true); 
     });
 });
 
@@ -94,5 +103,16 @@ describe('game play works correctly', () => {
         game.turnNumber = 42;
         showTurns();
         expect(game.turnNumber).toBe(0);
+    });
+    test('should increment the score if the turn is correct', () => {
+        game.playerMoves.push(game.currentGame[0]);
+        playerTurn();
+        expect(game.score).toBe(1);
+    });
+    test('clicking during the computer sequnce should fail', () => {
+        showTurns();
+        game.lastButton = '';
+        document.getElementById('button2').click();
+        expect(game.lastButton).toEqual('');
     });
 });
